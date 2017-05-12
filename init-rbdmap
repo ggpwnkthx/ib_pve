@@ -61,9 +61,9 @@ case "$1" in
         for pool in ${pools[@]}
         do
             rbds=($(ls /dev/rbd/$pool))
-            for rbd in ${rbd[@]}
+            for rbd in ${rbds[@]}
             do
-                rbd_list+=('$pool/$rbd')
+                rbd_list+=("$pool/$rbd")
             done
         done
         for i in ${rbd_list[@]}
