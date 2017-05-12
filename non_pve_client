@@ -1,0 +1,52 @@
+cd /tmp
+rm MLNX_OFED_LINUX-*.iso
+release=$(lsb_release -si)$(lsb_release -sr)
+wget http://content.mellanox.com/ofed/MLNX_OFED-4.0-1.0.1.0/MLNX_OFED_LINUX-4.0-1.0.1.0-${release,}-x86_64.iso
+if [ ! -f "iso" ]
+then
+  sudo mkdir iso
+fi
+sudo mount -o loop MLNX_OFED_LINUX-*.iso iso
+sudo apt-get -y install perl
+sudo /tmp/iso/mlnxofedinstall
+sudo umount /tmp/iso
+# Enable Ethernet IPoIB
+#sed -i '/^E_IPOIB_LOAD=/s/=.*/=yes/' /etc/infiniband/openib.conf
+# Fix opensm service
+sudo update-rc.d -f opensm remove
+sudo update-rc.d -f opensmd remove
+sudo sed -i 's/# Default-Start: null/# Default-Start: 2 3 4 5/g' /etc/init.d/opensmd
+sudo mv /etc/init.d/opensmd /etc/init.d/opensm
+sudo update-rc.d opensm defaults
+sudo update-rc.d opensm enable
+sudo service openibd start
+sudo service opensm start
+
+sudo apt-get install ceph-common
+read -p "PVE Hostname or IP:" pve_host
+sudo scp -r root@$pve_host:/etc/ceph /etc
+sudo mkdir /etc/pve
+sudo ln -s /etc/ceph /etc/pve/priv
+sudo sed -i 's/# Required-Start:    $network $remote_fs/# Required-Start:    $network $remote_fs openibd opensm/g' /etc/init.d/rbdmap
+awk '
+{ print }
+/rbdmap map/ {
+	print "	mons=($(cat /etc/ceph/ceph.conf | grep "mon addr" | awk '{print $4}' | awk '{split($0,a,":"); print a[1];}' ))"
+	print "	found=0"
+	print "	while [ $found -eq 0 ]"
+	print "	do"
+	print "		for i in ${mons[@]}"
+	print "		do"
+	print "		  ping=$(ping $i -c 1 | grep \"100% packet loss\")"
+	print "		  if [ -z $ping ]"
+	print "		  then"
+	print "       found=1"
+	print "     fi"
+	print "   done"
+	print " done"
+}
+' /etc/init.d/rbdmap
+sudo update-rc.d rbdmap defaults
+sudo mkdir /mnt/ceph
+sudo mkdir /mnt/ceph/rbd
+sudo service rbdmap start
