@@ -31,7 +31,7 @@ sudo sed -i 's/# Required-Start:    $network $remote_fs/# Required-Start:    $ne
 sudo awk '
 { print }
 /rbdmap map/ {
-	print "	mons=($(cat /etc/ceph/ceph.conf | grep "mon addr" | awk '{print $4}' | awk '{split($0,a,":"); print a[1];}' ))"
+	print "	mons=($(cat /etc/ceph/ceph.conf | grep \"mon addr\" | awk \'{print $4}\' | awk \'{split($0,a,\":\"); print a[1];}\' ))\"
 	print "	found=0"
 	print "	while [ $found -eq 0 ]"
 	print "	do"
