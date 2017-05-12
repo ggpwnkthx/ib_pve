@@ -28,7 +28,7 @@ sudo scp -r root@$pve_host:/etc/ceph /etc
 sudo mkdir /etc/pve
 sudo ln -s /etc/ceph /etc/pve/priv
 sudo sed -i 's/# Required-Start:    $network $remote_fs/# Required-Start:    $network $remote_fs openibd opensm/g' /etc/init.d/rbdmap
-awk '
+sudo awk '
 { print }
 /rbdmap map/ {
 	print "	mons=($(cat /etc/ceph/ceph.conf | grep "mon addr" | awk '{print $4}' | awk '{split($0,a,":"); print a[1];}' ))"
