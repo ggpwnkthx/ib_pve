@@ -27,26 +27,6 @@ read -p "PVE Hostname or IP:" pve_host
 sudo scp -r root@$pve_host:/etc/ceph /etc
 sudo mkdir /etc/pve
 sudo ln -s /etc/ceph /etc/pve/priv
-sudo sed -i 's/# Required-Start:    $network $remote_fs/# Required-Start:    $network $remote_fs openibd opensm/g' /etc/init.d/rbdmap
-sudo awk '
-{ print }
-/rbdmap map/ {
-	print "	mons=($(cat /etc/ceph/ceph.conf | grep \"mon addr\" | awk \'{print $4}\' | awk \'{split($0,a,\":\"); print a[1];}\' ))\"
-	print "	found=0"
-	print "	while [ $found -eq 0 ]"
-	print "	do"
-	print "		for i in ${mons[@]}"
-	print "		do"
-	print "			ping=$(ping $i -c 1 | grep \"100% packet loss\")"
-	print "			if [ -z $ping ]"
-	print "			then"
-	print "				found=1"
-	print "			fi"
-	print "		done"
-	print "	done"
-}
-' /etc/init.d/rbdmap
+sudo wget https://raw.githubusercontent.com/ggpwnkthx/ib_pve/master/init-rbdmap -O /etc/init.d/rbdmap
 sudo update-rc.d rbdmap defaults
-sudo mkdir /mnt/ceph
-sudo mkdir /mnt/ceph/rbd
 sudo service rbdmap start
