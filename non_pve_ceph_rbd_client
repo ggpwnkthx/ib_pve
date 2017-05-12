@@ -27,6 +27,6 @@ read -p "PVE Hostname or IP:" pve_host
 sudo scp -r root@$pve_host:/etc/ceph /etc
 sudo mkdir /etc/pve
 sudo ln -s /etc/ceph /etc/pve/priv
-sudo wget https://raw.githubusercontent.com/ggpwnkthx/ib_pve/master/init-rbdmap -O /etc/init.d/rbdmap
-sudo update-rc.d rbdmap defaults
-sudo service rbdmap start
+sudo wget https://raw.githubusercontent.com/ggpwnkthx/ib_pve/master/rbdmap.service -O /etc/systemd/system/rbdmap.service
+sudo systemctl enable rbdmap.service
+sudo systemctl start rbdmap.service
