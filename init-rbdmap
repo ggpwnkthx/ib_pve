@@ -42,7 +42,7 @@ case "$1" in
                         fi
                 done
         done
-        rbdmap map
+        $0 reload
         ;;
 
   stop)
@@ -56,6 +56,22 @@ case "$1" in
 
   reload)
         rbdmap map
+        rbd_list=()
+        pools=($(ls /dev/rbd))
+        for pool in ${pools[@]}
+        do
+            rbds=($(ls /dev/rbd/$pool))
+            for rbd in ${rbd[@]}
+            do
+                rbd_list+=('$pool/$rbd')
+            done
+        done
+        for i in ${rbd_list[@]}
+        do
+            sudo mkdir -p /mnt/ceph/rbd/$i
+            sudo mount /dev/rdb/$i /mnt/ceph/rbd/$i
+        done
+        
         ;;
 
   status)
