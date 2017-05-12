@@ -59,9 +59,9 @@ case "$1" in
         mapped=($(rbd showmapped | grep /dev))
         for i in ${mapped[@]}
         do
-            pool=$(cat $i | awk '{print $2}')
-            image=$(cat $i | awk '{print $3}')
-            device=$(cat $i | awk '{print $4}')
+            pool=$(echo $i | awk '{print $2}')
+            image=$(echo $i | awk '{print $3}')
+            device=$(echo $i | awk '{print $4}')
             mkdir -p /mnt/ceph/rbd/$pool/$image
             mount $device /mnt/ceph/rbd/$pool/$image
         done
