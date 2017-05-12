@@ -56,8 +56,8 @@ case "$1" in
 
   reload)
         rbdmap map
-        mapped=($(rbd showmapped | grep /dev))
-        for i in ${mapped[@]}
+        mapped=$(rbd showmapped | grep /dev)
+        while read -r i
         do
             pool=$(echo $i | awk '{print $2}')
             image=$(echo $i | awk '{print $3}')
@@ -73,7 +73,7 @@ case "$1" in
                     fi
                 fi
             fi
-        done
+        done >>> "$mapped"
         
         ;;
 
