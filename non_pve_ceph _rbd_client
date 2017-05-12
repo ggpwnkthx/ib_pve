@@ -37,13 +37,13 @@ sudo awk '
 	print "	do"
 	print "		for i in ${mons[@]}"
 	print "		do"
-	print "		  ping=$(ping $i -c 1 | grep \"100% packet loss\")"
-	print "		  if [ -z $ping ]"
-	print "		  then"
-	print "       found=1"
-	print "     fi"
-	print "   done"
-	print " done"
+	print "			ping=$(ping $i -c 1 | grep \"100% packet loss\")"
+	print "			if [ -z $ping ]"
+	print "			then"
+	print "				found=1"
+	print "			fi"
+	print "		done"
+	print "	done"
 }
 ' /etc/init.d/rbdmap
 sudo update-rc.d rbdmap defaults
