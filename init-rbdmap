@@ -62,8 +62,17 @@ case "$1" in
             pool=$(echo $i | awk '{print $2}')
             image=$(echo $i | awk '{print $3}')
             device=$(echo $i | awk '{print $4}')
-            mkdir -p /mnt/ceph/rbd/$pool/$image
-            mount $device /mnt/ceph/rbd/$pool/$image
+            if [ ! -z $pool ]
+            then
+                if [ ! -z $image ]
+                then
+                    if [ ! -z $device ]
+                    then
+                        mkdir -p /mnt/ceph/rbd/$pool/$image
+                        mount $device /mnt/ceph/rbd/$pool/$image
+                    fi
+                fi
+            fi
         done
         
         ;;
